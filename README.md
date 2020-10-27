@@ -1,27 +1,28 @@
 # AUC-EGYPT
 This Repo is maintained by Team AUC-EGYPT
-AUC-Egypt Software
+# Toeholder 2.0
 
-Background on Toehold switches 
-The design process described in the original publications of toehold switches is very lengthy(Green et al., 2014; Pardee et al., 2016). It involves the search for triggers that are structurally predicted to display a minimum number of unpaired bases. Based on these triggers, toehold switches are designed and checked for the presence of stop codons. Candidate toehold switches are assessed in silico based on free energy metrics, structural stability, and orthogonality (See Modeling). Accordingly, multiple iGEM teams sought to automate the design process of toehold switches (Ulaval, CUHK, EPFL). The original class of toehold switches was compatible with prokaryotic and cell free expression systems, but not with mammalian contexts. In our case, we are utilizing toehold switches to sense SARS-CoV-2 mRNA in human host cells which requires some modifications (See Engineering). 
+![](Figures/toeholder.png)
 
-Workflow
-To our knowledge, there is no available tool customized to generate mammalian toehold switches. Accordingly, we sought to utilize an available software and customize it to fit our context. Ulaval’s Toeholder was the software of choice as it was developed recently in 2019, and the source code was publicly available. We troubleshooted some errors, enhanced the processing time and processing capacity as described in the Contributions. We also changed the toehold design scheme. Here, we detail the workflow of the improved algorithm. 
-The tool identifies candidate triggers of user-specified length, typically around 30 nucleotides. A Candidate trigger is enlisted if it features 2 weak base pairs (A-T) at the stem base of the hairpin(Green et al., 2014). Using a sliding window of width 200 nucleotides, the tool utilizes NUPACK free energy functionalities to predict the secondary structure of the of the 30-nucleotide trigger region, flanked in a 200-nucleotide window. A trigger region is rejected if the number of unpaired bases is lower than that specified by the user. Subsequently, a toehold switch is designed for each candidate trigger as follows:
-•	To a triad of GGG, the sensing domain (a & b), reverse complement of the trigger, is appended. The GGG triad improves the transcription efficiency (Green et al., 2014)
-•	A rationally engineered loop structure featuring the Kozac consensus sequence is added. 
-•	The hairpin is closed with the reverse complement of the ‘b’ domain of the sensing region.
-•	A 21-nucleotide linker of low molecular weight amino acids is appended to ensure minimal cross talk between the toehold and downstream gene.
-•	If specified by the user, a reporter is added downstream of the toehold switch. 
-Candidate toeholds are checked for the presence of a stop codon after the Kozac sequence (the start codon is the last three nucleotides of the Kozac sequence). Using the NUPACK suite, minimal free energy (MFE) structure of the toehold switch is predicted, ΔGtoehold, ΔGRBS-Linker, binding energy, and MFE difference between the bound and the unbound states are calculated and outputted in a single CSV file. After that, toeholds are cross-referenced against user-specified sequences to ensure specificity and minimal crosstalk between the toehold and the host system.
-Insert original Workflow design and toehold if possible
- 
-Improved processing time
-We improved the processing time of Toeholder by redefining the trigger regions as described in the Contributions. Briefly, instead of passing the whole input sequence as a trigger region, the sequence is parsed, and only a region of 200 nucleotides spanning the 30-nucleotide trigger is passed to NUPACK minimal free energy (mfe) function. This step was of complexity O(N3), where N is the length of the sequence (Zadeh et al., 2011). Now that we are passing a trigger region of constant length, the complexity becomes O(1). In other words, irrespective of the size of the input sequence the processing time of this step constant. 
-To test the processing time of the improved version, we performed a benchmarking experiment. We fed Fasta files of different sizes to both the improved and the original versions of Toeholder.  Our improved version proved it can process at less time (Fig). When the input file size was 1 kb, the new version processed it in 2.5 minutes while the original tool processed ~13 minutes. Moving beyond 1kb, the original tool consumed a full session of 12 hours on Google Colab and did not yield a full output. Comparatively, the same file was processes in ~5 minutes. Moreover, it was able to process a 30 kb file in less than 80 minutes. It is evident from the chart that the processing time of the new version grows linearly rather than exponentially. 
-  
-Figure 1 Benchmarking 
-In the file input_variables.py, the minimum number of paired bases was set to 15, and the length of both the paired and unpaired was set to 15. We passed an empty file for the cross referencing test as it was not necessary for our benchmarking. It is clear that our improved version processes the file size in less amount of time.
+## Description
+
+Toeholder is a tool that can efficiently design toehold riboswitches for the detection of a target gene in mammalian systems. A toehold riboswitch is an RNA molecule that contains the necessary elements for the expression of a reporter gene, i. e. kozak sequence (a ribosome binding sequence (RBS) and a start codon), and the reporter gene sequence. What makes toehold riboswitches special is that they fold into a secondary structure that blocks the access of the ribosome to the Kozak sequence, thus preventing gene expression. However, they are carefully designed so that they can bind to a trigger sequence within a target gene, which results in the unfolding of the secondary structure and allows the expression of the reporter gene (Green et al. 2014. Cell.). Applications for toehold riboswitches range from detection of sequences of pathogenic organisms (Pardee, et al. 2016. Cell; Ma, et al. 2018. Synthetic Biology) to creating logical systems (Green et al. 2014. Cell; Green, et al. 2017. Nature).
+
+![](Figures/toehold_diagram.png)
+
+Toeholder aims to facilitate the design of these molecules by offering the following capabilities:
+- Testing all the different trigger sequences within a target gene.
+- Simulating the secondary structure of the proposed riboswitch for each trigger.
+- Simulating the binding of each toehold riboswitch to the target gene to test if it binds accurately to its corresponding trigger.
+- Aligning to user-defined genomes in order to select generalist or specific riboswitches as needed
+
+The above tests have allowed us to design toehold riboswitches for different organisms. Secondary structures obtained are very close to the ones observed for the riboswitches published by Green et al. (2014), and 70-79% of them are predicted to bind perfectly to their trigger sequences within the target gene. The remaining 21-30% are identified as binding partially or with a shift to the target or as having stop codons at undesirable positions, which allows discarding them. Finally, the alignment function has allowed us to design toeholds that are specific for the genome of a given strain, but also to select those that have matches in several strains of the same organism. All in all, these functions make toeholder a very versatile tool.
+
+For further information, please refer to our wiki:
+https://2020.igem.org/Team:AUC-EGYPT
+
+## Dependencies
+
 Installation in 6 simple steps!
 To start working with the tool, users are opted to follow these 6 simple steps to install the compatible dependencies.
 •	Download NUPACK 3.2.2 (http://nupack.org/downloads) and install as follows:
@@ -50,11 +51,53 @@ To run the tool, users are required to fill in the inputs in the input_variables
 •	Reporter gene if any
 •	Minimum number of unpaired bases in the trigger. 
 After installing all the libraries and dependencies, users are opted to open the terminal in the root directory of Toeholder and type ‘python3 toeholder.py’. Results are incremented to the output folder path specified by the user.
-والسلام عليكم ورحمة الله وبركاته
 
-References 
-Green, A. A., Silver, P. A., Collins, J. J., & Yin, P. (2014). Toehold Switches: De-Novo-Designed Regulators of Gene Expression. Cell, 159(4), 925–939. https://doi.org/10.1016/j.cell.2014.10.002
-Pardee, K., Green, A. A., Takahashi, M. K., Braff, D., Lambert, G., Lee, J. W., Ferrante, T., Ma, D., Donghia, N., Fan, M., Daringer, N. M., Bosch, I., Dudley, D. M., O’Connor, D. H., Gehrke, L., & Collins, J. J. (2016). Rapid, Low-Cost Detection of Zika Virus Using Programmable Biomolecular Components. Cell, 165(5), 1255–1266. https://doi.org/10.1016/j.cell.2016.04.059
-Zadeh, J. N., Wolfe, B. R., & Pierce, N. A. (2011). Nucleic acid sequence design via efficient ensemble defect optimization. Journal of Computational Chemistry, 32(3), 439–452. https://doi.org/10.1002/jcc.21633
+## Scripts
+
+All scripts are written in Python 3 and depend on the following libraries
+
+- toeholder.py: Sweeps through the sequence of the target gene looking for suitable candidate recognition sequences. All candidate recognition sequences are evaluated based on the following parameters:
+	- Secondary structure on the mRNA
+	- ddG of the bound (toehold + target) and unbound state (toehold and target, separately)
+
+- input_variables.py: Defines tunable parameters and input files for the toeholder script.
+
+- toeholder_helper_functions.py: Contains several helper functions for the other scripts.
+
+- alignments.py: Aligns the toeholds to a selected set of reference genomes to identify matches. Toeholds matching more than one sequence or matching sequences from other genomes would not be completely specific to the target.
+
+
+## Output
+
+The toeholder.py script generates an output folder with a subfolder for each of the candidate toeholds generated. When the candidate toehold contains a stop codon, its corresponding subfolder is empty. When it does not contain a stop codon, there are four files inside the subfolder:
+- switch1_python.in: NUPACK-formatted input to test the toehold's secondary structure.
+- switch1_python.mfe: NUPACK-formatted output with the most favorable secondary structure.
+- toehold_mRNA.in: NUPACK-formatted input to test the toehold's ability to bind to the target mRNA.
+- toehold_mRNA.mfe: NUPACK-formatted output with the most favorable structure of the toehold-mRNA complex.
+- RBS_LINKER.in:NUPACK-formatted input to test the RBS-LINKER secondary structure.
+- RBS_LINKER.mfe: NUPACK-formatted output with the most favorable secondary structure of the RBS-LINKER.
+
+Outside those folders, the rest of the files are:
+- input_variables.py: Copy of the input variables used for this run.
+- mRNA.in: NUPACK-formatted input to test the mRNA's secondary structure. This file is not correctly formated in Toeholder.py as it contains information about the last trigger region only, not the full input mRNA
+- mRNA.mfe: NUPACK-formatted output with the most favorable secondary structure for the mRNA. This file is not correctly formated in Toeholder.py as it contains information about the last trigger region only, not the full input mRNA
+- toehold_candidates.txt: List of candidate triggers ranked by the number of non-paired positions in the secondary structure of the trigger of the target mRNA.
+- toehold_seqs.fasta: FASTA-formatted file containing the recognition sequences for each of the toeholds.
+- all_toeholds_results.txt: Results of the tests performed on the toeholds. It adds the following columns to the toehold_candidates.txt file:
+	- Toehold index
+	- Binding_energy_toehold_mRNA: the free energy of binding between the toehold and the 200-nt Trigger region 
+	- Percentage of paired bases of the toehold-mRNA complex that correspond the intended base pairing
+	- Binding_energy_toehold:Free energy of the toehold secondary structure
+	- GC content: in Toehold 
+	- deltaG_RBS_LINKER: free energy of the RBS-Linker
+	- MFE_Difference: free energy difference between the bound and the unbound state
+	- toehold structure: Minimal free energy structure in the .( format
+	- toehold sequence
+	
+	
+- \<tag\>_toeholds_alignment.aln: Output of the BLAST alignment of the library of toeholds to the genome referenced with the corresponding tag in the genome list.
+- all_toeholds_results_genome_matches.txt: Adds the counts of matches for each toehold in each of the genomes referenced in the genome list.
+
+
 
 
