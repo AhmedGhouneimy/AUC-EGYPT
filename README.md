@@ -32,28 +32,49 @@ To start working with the tool, users are opted to follow these 6 simple steps t
 Go to the root directory type the following commands: 
 
 mkdir build
+
 cd build
+
 cmake ../
+
 make
+
 make install
+
 •	Install blast+: sudo apt-get install ncbi-blast+
+
 •	Install Biopython 1.73: pip3 install biopython==1.73
+
 •	Install Numpy 1.16.4: pip3 install numpy==1.16.4
+
 •	Install pandas 0.24.2: pip3 install pandas==0.24.2
+
 •	Download Toeholder (Git link) and go to the root directory and type 
+
 python3 toeholder.py 
+
 
 How to use the tool
 
+
 To run the tool, users are required to fill in the inputs in the input_variables.py file. They are asked to provide the following:
+
 •	Path to the input Fasta file
+
 •	Path to the output folder
+
 •	Length of the unpaired domain (the ‘a’ domain) 
+
 •	Length of the paired domain (the ‘b’ domain) 
+
 •	A path to reference genome for cross referencing if any and the percentage identity and the e-value.
+
 •	The molecule type: “DNA” or “RNA” 
+
 •	Reporter gene if any
+
 •	Minimum number of unpaired bases in the trigger. 
+
 After installing all the libraries and dependencies, users are opted to open the terminal in the root directory of Toeholder and type ‘python3 toeholder.py’. Results are incremented to the output folder path specified by the user.
 
 ## Scripts
