@@ -21,12 +21,16 @@ The above tests have allowed us to design toehold riboswitches for different org
 For further information, please refer to our wiki:
 https://2020.igem.org/Team:AUC-EGYPT
 
-## Dependencies
+## Dependencies and Installation
 
 Installation in 6 simple steps!
+
 To start working with the tool, users are opted to follow these 6 simple steps to install the compatible dependencies.
+
 •	Download NUPACK 3.2.2 (http://nupack.org/downloads) and install as follows:
+
 Go to the root directory type the following commands: 
+
 mkdir build
 cd build
 cmake ../
